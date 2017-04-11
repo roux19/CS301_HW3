@@ -40,11 +40,11 @@ public class Ball {
         //gravity
         velY += 1.0f;
 
-        //bounsing
-        if ( curX < radius ) velX = Math.abs(velX);
-        if ( curX > maxX-radius ) velX = -Math.abs(velX);
-        if ( curY < radius ) velY = Math.abs(velY);
-        if ( curY > maxY-radius ) velY = -Math.abs(velY);
+        //bouncing
+        if ( curX < radius ) velX = Math.abs(velX*.9f);
+        if ( curX > maxX-radius ) velX = -Math.abs(velX*.9f);
+        if ( curY < radius ) velY = Math.abs(velY*.9f);
+        if ( curY > maxY-radius ) velY = -Math.abs(velY*.9f);
 
     }
 

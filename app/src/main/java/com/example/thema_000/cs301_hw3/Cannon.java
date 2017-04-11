@@ -7,6 +7,7 @@ import android.graphics.Path;
 import android.util.Log;
 import android.view.MotionEvent;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -41,7 +42,7 @@ public class Cannon implements Animator {
     private Target[] targets = new Target[2];
 
     //ball
-    private Ball ball;
+    private ArrayList<Ball> balls = new ArrayList<Ball>();
 
     @Override
     public int interval() {
@@ -67,26 +68,28 @@ public class Cannon implements Animator {
     public void tick(Canvas canvas) {
 
         //go through the targets
-        for( int i = 0; i < 2; i++) {
+        for( int j = 0; j < 2; j++) {
 
-            //if this target exists and there is a ball
-            if (targets[i] != null && ball != null) {
-                //get the distance between them
-                float dist = (float) Math.sqrt((ball.getCurX()-targets[i].getxCenter()) * (ball.getCurX()-targets[i].getxCenter())
-                        + (ball.getCurY()-targets[i].getyCenter()) * (ball.getCurY()-targets[i].getyCenter()));
+            //for all the balls
+            for( int i = 0; i < balls.size(); i++) {
+                //if this target exsists
+                if (targets[j] != null) {
+                    //get the distance between them
+                    float dist = (float) Math.sqrt((balls.get(i).getCurX() - targets[j].getxCenter()) * (balls.get(i).getCurX() - targets[j].getxCenter())
+                            + (balls.get(i).getCurY() - targets[j].getyCenter()) * (balls.get(i).getCurY() - targets[j].getyCenter()));
 
-                //if the distance is less than their combined radius
-                if (dist < ball.getRadius()+targets[i].getRadius())
-                {
-                    Random rand = new Random();
-                    targets[i] = null; //nullify target
-                    ballColor = rand.nextInt(0xFFFFF) + 0xFF000000; //set random ball collor
+                    //if the distance is less than their combined radius
+                    if (dist < balls.get(i).getRadius() + targets[j].getRadius()) {
+                        Random rand = new Random();
+                        targets[j] = null; //nullify target
+                        ballColor = rand.nextInt(0xFFFFF) + 0xFF000000; //set random ball collor
+                    }
                 }
             }
 
             //if the target is null (just started or target was hit)
-            if (targets[i] == null) {
-                targets[i] = new Target(); //make a new target
+            if (targets[j] == null) {
+                targets[j] = new Target(); //make a new target
             }
         }
 
@@ -115,14 +118,16 @@ public class Cannon implements Animator {
         cannon.lineTo(0.0f, canvas.getHeight());
 
         //if there's a ball
-        if ( ball != null ) {
+        for( Ball ball : balls )
+        {
             //move it and draw it
             ball.tick();
             canvas.drawOval(ball.getLeft(), ball.getTop(), ball.getRight(), ball.getBot(), ballPaint);
         }
         for ( Target t : targets )
         {
-            //draw the targets
+            //draw and move the targets
+            t.tick();
             canvas.drawOval(t.getLeft(), t.getTop(), t.getRight(), t.getBot(), targetPaint);
         }
         //draw the cannon
@@ -134,8 +139,8 @@ public class Cannon implements Animator {
     private void fire() {
 
         //make a ball at the tip of the cannon
-        ball = new Ball( bottomRightX+topLeftX/2, canvasHegiht-bottomRightY-topLeftY/2, cannonAngle,
-                canvasHegiht, canvasWidth);
+        balls.add(new Ball( bottomRightX+topLeftX/2, canvasHegiht-bottomRightY-topLeftY/2, cannonAngle,
+                canvasHegiht, canvasWidth));
 
     }
 
